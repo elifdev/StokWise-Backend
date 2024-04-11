@@ -49,8 +49,8 @@ public class ProductService {
 			long unitInStock = (long) product[1]; // Ürün adedi
 			String name = (String) product[2]; // Ürün adı
 
-			GetAllProductsFromShelvesResponseDTO allProduct = new GetAllProductsFromShelvesResponseDTO(productId,
-					unitInStock, name);
+			GetAllProductsFromShelvesResponseDTO allProduct = new GetAllProductsFromShelvesResponseDTO(
+					productId, unitInStock, name);
 			allProducts.add(allProduct);
 		}
 
