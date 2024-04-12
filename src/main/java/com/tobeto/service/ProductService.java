@@ -191,39 +191,33 @@ public class ProductService {
 
 	private void dispatchFromFullShelf(int count, ShelfProduct shelfProduct) {
 
-		List<ShelfProduct> fullShelve = shelfProductRepository
+		List<ShelfProduct> fullShelves = shelfProductRepository
 				.findByProductIdAndProductCountGreaterThan(
 						shelfProduct.getProduct().getId(), 0);
 
-		int nextFullShelf = fullShelve.size() - 1; // sıradaki ilk dolu sırası
-													// demiş hoca ingilizce
-													// ifadesine bir daha
-													// bakalım
+		int nextFullShelf = fullShelves.size() - 1;
 
 		while (count > 0) {
 
 			if (nextFullShelf < 0) {
 
-				// elimizde gönderim yapabileğimiz dolu raf kalmadı.
-
 				throw new ServiceException(ERROR_CODES.PRODUCT_NOT_FOUND);
 
 			}
 
-			ShelfProduct shelf = fullShelve.get(nextFullShelf); // ilk dolu raf
+			ShelfProduct shelf = fullShelves.get(nextFullShelf);
 
 			int dispatchAmount = count;
 			int shelfProductCount = shelfProductRepository
 					.findProductCountByShelfIdAndProductId(
 							shelf.getShelf().getId(),
 							shelfProduct.getProduct().getId());
-
 			if (dispatchAmount > shelfProductCount) {
 				dispatchAmount = shelfProductCount;
 			}
 
 			shelf.setProductCount(shelfProductCount - dispatchAmount);
-			if (shelfProductCount == 0) {
+			if (shelf.getProductCount() == 0) {
 				// bu raftaki bu ürün bitti
 
 				shelfProductRepository.deleteProductFromShelf(

@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class GetAllProductsFromShelvesResponseDTO {
 
-	private int productId;
+	private int id;
 	private long unitInStock;
 	private String name;
 

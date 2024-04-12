@@ -21,7 +21,8 @@ public class ServiceException extends RuntimeException {
 		SET_SHELF_COUNT(6,
 				"You cannot set capacity less than the number of products in the shelf."),
 		SHELF_CAPACITY(7,
-				"You cannot set capacity less than 50 and bigger than 200");
+				"You cannot set capacity less than 50 and bigger than 200"),
+		PRODUCT_STOCK_ERROR(8, "Product unit in stock less than entry count.");
 
 		private int code;
 		private String message;

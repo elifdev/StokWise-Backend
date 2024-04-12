@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.tobeto.dto.SuccessResponseDTO;
 import com.tobeto.dto.product.ProductDTO;
+import com.tobeto.dto.product.request.DispatchProductRequestDTO;
 import com.tobeto.dto.product.request.EntryProductRequestDTO;
 import com.tobeto.dto.shelf.ShelfDTO;
 import com.tobeto.dto.shelf.request.AddShelfRequestDTO;
@@ -115,7 +116,7 @@ public class ShelfController {
 	// ÜRÜN ÇIKIŞI
 	@PostMapping("/dispatchProduct")
 	public ResponseEntity<String> dispatchProduct(
-			@RequestBody EntryProductRequestDTO dto) {
+			@RequestBody DispatchProductRequestDTO dto) {
 		try {
 			productService.dispatchProduct(dto.getProductId(), dto.getCount());
 			return ResponseEntity.ok("Product dispatch successfully!");

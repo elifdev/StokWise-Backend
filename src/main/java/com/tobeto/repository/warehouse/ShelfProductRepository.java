@@ -41,6 +41,9 @@ public interface ShelfProductRepository
 	@Query("SELECT sp FROM ShelfProduct sp JOIN sp.shelf shelf WHERE sp.product.id = :productId GROUP BY sp.id, shelf.id HAVING SUM(sp.productCount) < MAX(shelf.capacity) ORDER BY SUM(sp.productCount) ASC LIMIT 1")
 	Optional<ShelfProduct> findByProductIdNotFull(int productId);
 
+	@Query("SELECT sp FROM ShelfProduct sp WHERE sp.product.id = :productId ORDER BY sp.productCount ASC")
+	Optional<ShelfProduct> findByProductIdOrderByProductCountAsc(int productId);
+
 	// gelen id'li rafta id'si verilen ürünü raftan çıkar
 	@Transactional
 	@Modifying
