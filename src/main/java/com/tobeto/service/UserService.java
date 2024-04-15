@@ -22,7 +22,14 @@ public class UserService {
 	private PasswordEncoder passwordEncoder;
 
 	public List<User> getAllUser() {
-		return userRepository.findAll();
+		List<User> allUsers = userRepository.findAll();
+		allUsers.forEach(u -> {
+			List<Role> roles = userRepository.findRolesByEmail(u.getEmail());
+			System.out.println(roles);
+			u.setRoles(roles);
+		});
+
+		return allUsers;
 	}
 
 	public Optional<User> getUserByEmail(String email) {
@@ -39,8 +46,11 @@ public class UserService {
 			User dbUser = oUser.get();
 			dbUser.setEmail(user.getEmail());
 			dbUser.setPassword(user.getPassword());
-			List<Role> existingRoles = dbUser.getRoles();
-			user.setRoles(existingRoles);
+
+			//
+			List<Role> updatedRoles = user.getRoles();
+			dbUser.setRoles(updatedRoles);
+			//
 
 			return userRepository.save(dbUser);
 		} else {
@@ -59,18 +69,18 @@ public class UserService {
 			String email) {
 		Optional<User> oUser = userRepository.findByEmail(email);
 		if (oUser.isPresent()) {
-			// kullanıcı, adına göre veritabanında bulundu.
-			// şifresini kontrol edelim.
 			User dbUser = oUser.get();
-			if (passwordEncoder.matches(oldPassword, dbUser.getPassword())) {
-				// şifresi doğru. Şifresini yeni şifre ile güncelleyelim.
-				// kullanici.setSifre(passwordEncoder.encode(yeniSifre));
+			if (oldPassword.equals(dbUser.getPassword())) {
 				dbUser.setPassword(newPassword);
 				userRepository.save(dbUser);
 				return true;
 			}
 		}
 		return false;
+	}
+
+	public List<Role> getUserRolesByEmail(String email) {
+		return userRepository.findRolesByEmail(email);
 	}
 
 }

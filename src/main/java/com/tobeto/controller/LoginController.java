@@ -37,7 +37,6 @@ public class LoginController {
 			return ResponseEntity.ok(new LoginResponseDTO(token));
 		} else {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-
 		}
 	}
 
