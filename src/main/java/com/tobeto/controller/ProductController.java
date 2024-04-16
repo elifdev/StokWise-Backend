@@ -78,4 +78,11 @@ public class ProductController {
 		return new SuccessResponseDTO("Product updated!");
 	}
 
+	@GetMapping("/reportProduct")
+	public SuccessResponseDTO generateProductReportAndPDF() {
+		productService.transferProductsToReportAndGeneratePDF();
+		return new SuccessResponseDTO("Product report generated successfully!");
+
+	}
+
 }

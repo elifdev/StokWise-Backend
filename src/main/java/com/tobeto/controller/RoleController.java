@@ -11,33 +11,32 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.tobeto.dto.category.GetAllCategories;
-import com.tobeto.entities.warehouse.Category;
-import com.tobeto.service.CategoryService;
+import com.tobeto.dto.RoleDTO;
+import com.tobeto.entities.user.Role;
+import com.tobeto.service.RoleService;
 
 @RestController
-@RequestMapping("/api/v1/category")
-public class CategoryController {
+@RequestMapping("/api/v1")
+public class RoleController {
 
 	@Autowired
-	private CategoryService categoryService;
-
+	private RoleService roleService;
 	@Autowired
 	@Qualifier("requestMapper")
 	private ModelMapper requestMapper;
 
-	////
 	@Autowired
 	@Qualifier("responseMapper")
 	private ModelMapper responseMapper;
 
-	@GetMapping("/getAll") // ResponseEntity
-	public ResponseEntity<List<GetAllCategories>> getAllProducts() {
-		List<Category> allCategories = categoryService.getAllCategories();
-		List<GetAllCategories> allCategoriesDTO = new ArrayList<>();
-		allCategories.forEach(category -> {
-			allCategoriesDTO.add(responseMapper.map(category, GetAllCategories.class));
+	@GetMapping("/role/getAll")
+	public ResponseEntity<List<RoleDTO>> getAllRoles() {
+		List<Role> roles = roleService.getAllRoles();
+		List<RoleDTO> rolesDTOs = new ArrayList<>();
+		roles.forEach(r -> {
+			rolesDTOs.add(responseMapper.map(r, RoleDTO.class));
 		});
-		return ResponseEntity.ok(allCategoriesDTO);
+		return ResponseEntity.ok(rolesDTOs);
 	}
+
 }

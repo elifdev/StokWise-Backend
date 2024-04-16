@@ -2,6 +2,7 @@ package com.tobeto.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,7 +26,7 @@ public class SignUpController {
 
 	@PostMapping("/user/signup")
 	public ResponseEntity<SignupResponseDTO> userSignUp(
-			@RequestBody SignupRequestDTO signupRequestDTO) {
+			@Validated @RequestBody SignupRequestDTO signupRequestDTO) {
 
 		User user = loginService.userSignUp(signupRequestDTO.getEmail(),
 				signupRequestDTO.getPassword());
