@@ -26,7 +26,7 @@ public class CategoryController {
 	@Qualifier("requestMapper")
 	private ModelMapper requestMapper;
 
-	///
+	////
 	@Autowired
 	@Qualifier("responseMapper")
 	private ModelMapper responseMapper;
@@ -36,8 +36,7 @@ public class CategoryController {
 		List<Category> allCategories = categoryService.getAllCategories();
 		List<GetAllCategories> allCategoriesDTO = new ArrayList<>();
 		allCategories.forEach(category -> {
-			allCategoriesDTO
-					.add(responseMapper.map(category, GetAllCategories.class));
+			allCategoriesDTO.add(responseMapper.map(category, GetAllCategories.class));
 		});
 		return ResponseEntity.ok(allCategoriesDTO);
 	}
