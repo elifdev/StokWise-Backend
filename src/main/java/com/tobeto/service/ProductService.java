@@ -1,12 +1,23 @@
 package com.tobeto.service;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
 import com.tobeto.dto.shelfProduct.response.GetAllProductsFromShelvesResponseDTO;
 import com.tobeto.entities.warehouse.Category;
 import com.tobeto.entities.warehouse.Product;
@@ -16,7 +27,6 @@ import com.tobeto.exception.ServiceException.ERROR_CODES;
 import com.tobeto.repository.warehouse.CategoryRepository;
 import com.tobeto.repository.warehouse.ProductRepository;
 import com.tobeto.repository.warehouse.ShelfProductRepository;
-import com.tobeto.repository.warehouse.ShelfRepository;
 
 import jakarta.transaction.Transactional;
 
@@ -28,9 +38,6 @@ public class ProductService {
 
 	@Autowired
 	private CategoryRepository categoryRepository;
-
-	@Autowired
-	private ShelfRepository shelfRepository;
 
 	@Autowired
 	private ShelfProductRepository shelfProductRepository;
@@ -232,6 +239,98 @@ public class ProductService {
 
 		}
 
+	}
+
+	@Transactional
+	public void transferProductsToReportAndGeneratePDF() {
+		List<Product> products = productRepository.findAll();
+
+		Document document = new Document();
+		try {
+			String timestamp = new SimpleDateFormat("yyyyMMddHHmmss")
+					.format(new Date());
+			String fileName = "product_report_" + timestamp + ".pdf";
+
+			PdfWriter.getInstance(document, new FileOutputStream(fileName));
+			document.setPageSize(PageSize.A4.rotate());
+			document.open();
+			// Maksimum 30 ürün içeren tabloları tutmak için bir liste oluşturun
+			List<PdfPTable> tables = new ArrayList<>();
+
+			PdfPTable table = null;
+			int count = 0;
+
+			for (Product product : products) {
+				// Her 23 ürün için yeni bir tablo oluşturun
+				if (count % 15 == 0) {
+					if (table != null) {
+						tables.add(table);
+					}
+					table = new PdfPTable(7);
+					table.setWidthPercentage(100);
+					table.addCell("Product Name");
+					table.addCell("Category");
+					table.addCell("Price");
+					table.addCell("Quantity");
+					table.addCell("Unit In Stock");
+					table.addCell("Minimum Count");
+					table.addCell("Description");
+				}
+
+				// Her hücre için bir PdfPCell oluşturun ve padding ekleyin
+				PdfPCell cell = new PdfPCell(new Phrase(product.getName()));
+				cell.setPadding(5); // Padding ayarı
+				table.addCell(cell);
+
+				cell = new PdfPCell(
+						new Phrase(product.getCategory().getName()));
+				cell.setPadding(5); // Padding ayarı
+				table.addCell(cell);
+
+				cell = new PdfPCell(
+						new Phrase(Double.toString(product.getPrice())));
+				cell.setPadding(5); // Padding ayarı
+				table.addCell(cell);
+
+				cell = new PdfPCell(
+						new Phrase(Integer.toString(product.getQuantity())));
+				cell.setPadding(5); // Padding ayarı
+				table.addCell(cell);
+
+				cell = new PdfPCell(
+						new Phrase(Integer.toString(product.getUnitInStock())));
+				cell.setPadding(5); // Padding ayarı
+				table.addCell(cell);
+
+				cell = new PdfPCell(new Phrase(
+						Integer.toString(product.getMinimumCount())));
+				cell.setPadding(5); // Padding ayarı
+				table.addCell(cell);
+
+				cell = new PdfPCell(new Phrase(product.getDescription()));
+				cell.setPadding(5); // Padding ayarı
+				table.addCell(cell);
+
+				count++;
+			}
+
+			// Son tabloyu listeye ekleyin
+			if (table != null) {
+				tables.add(table);
+			}
+
+			// Tüm tabloları dokümana ekleyin
+			for (PdfPTable t : tables) {
+				document.add(t);
+				// Yeni bir sayfa ekleyin
+				document.newPage();
+			}
+
+		} catch (DocumentException | IOException e) {
+			e.printStackTrace();
+		} finally {
+			document.close();
+		}
 	}
 
 }
