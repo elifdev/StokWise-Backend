@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.tobeto.entities.user.Role;
@@ -18,14 +17,15 @@ public class UserService {
 
 	@Autowired
 	private UserRepository userRepository;
-	@Autowired
-	private PasswordEncoder passwordEncoder;
+
+//	@Autowired
+//	private PasswordEncoder passwordEncoder;
 
 	public List<User> getAllUser() {
 		List<User> allUsers = userRepository.findAll();
 		allUsers.forEach(u -> {
 			List<Role> roles = userRepository.findRolesByEmail(u.getEmail());
-			System.out.println(roles);
+//			System.out.println(roles);
 			u.setRoles(roles);
 		});
 
@@ -79,8 +79,8 @@ public class UserService {
 		return false;
 	}
 
-	public List<Role> getUserRolesByEmail(String email) {
-		return userRepository.findRolesByEmail(email);
-	}
+//	public List<Role> getUserRolesByEmail(String email) {
+//		return userRepository.findRolesByEmail(email);
+//	}
 
 }
