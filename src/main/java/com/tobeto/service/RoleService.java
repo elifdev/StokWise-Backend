@@ -10,6 +10,7 @@ import com.tobeto.repository.user.RoleRepository;
 
 @Service
 public class RoleService {
+
 	@Autowired
 	private RoleRepository roleRepository;
 
