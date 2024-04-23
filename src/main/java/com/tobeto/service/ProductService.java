@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -47,17 +48,16 @@ public class ProductService {
 	}
 
 	public List<GetAllProductsFromShelvesResponseDTO> getAllProductsFromShelves() {
-		List<Object[]> products = shelfProductRepository
-				.getAllProductsFromShelves();
+		List<Object[]> products = shelfProductRepository.getAllProductsFromShelves();
 		List<GetAllProductsFromShelvesResponseDTO> allProducts = new ArrayList<>();
 
 		for (Object[] product : products) {
-			int productId = (int) product[0]; // Ürün ID'si
+			UUID productId = (UUID) product[0]; // Ürün ID'si
 			long unitInStock = (long) product[1]; // Ürün adedi
 			String name = (String) product[2]; // Ürün adı
 
-			GetAllProductsFromShelvesResponseDTO allProduct = new GetAllProductsFromShelvesResponseDTO(
-					productId, unitInStock, name);
+			GetAllProductsFromShelvesResponseDTO allProduct = new GetAllProductsFromShelvesResponseDTO(productId,
+					unitInStock, name);
 			allProducts.add(allProduct);
 		}
 
@@ -65,8 +65,7 @@ public class ProductService {
 	}
 
 	public Product addProduct(Product product) {
-		Optional<Category> oCategory = categoryRepository
-				.findById(product.getCategory().getId());
+		Optional<Category> oCategory = categoryRepository.findById(product.getCategory().getId());
 		if (oCategory.isPresent()) {
 			product.setCategory(oCategory.get());
 		}
@@ -81,21 +80,20 @@ public class ProductService {
 //			product.setCategory(oCategory.get());
 //		}
 
-		Optional<Product> oProduct = productRepository
-				.findById(product.getId());
+		Optional<Product> oProduct = productRepository.findById(product.getId());
 		if (oProduct.isPresent()) {
 			product.setCategory(oProduct.get().getCategory());
 		}
 		return productRepository.save(product);
 	}
 
-	public void deleteProduct(int id) {
+	public void deleteProduct(UUID id) {
 		productRepository.deleteById(id);
 	}
 
 	///////////////// BURADAN SONRASI EKLENDİ
 
-	public Product getProduct(int productId) { // getFruit
+	public Product getProduct(UUID productId) { // getFruit
 		Optional<Product> oProduct = productRepository.findById(productId);
 		Product product = null;
 		if (oProduct.isPresent()) {
@@ -108,7 +106,7 @@ public class ProductService {
 	}
 
 	// Yeni metod: Stok miktarını arttır
-	public void increaseProductStock(int productId, int count) {
+	public void increaseProductStock(UUID productId, int count) {
 		Product product = getProduct(productId);
 		int currentStock = product.getUnitInStock();
 
@@ -133,9 +131,8 @@ public class ProductService {
 	// öncelikle gelen id li ürünün raflarda olup olmadığını
 	// kontrol eden metodu yazdım
 
-	private ShelfProduct getProductFromShelf(int productId) {
-		Optional<ShelfProduct> oProduct = shelfProductRepository
-				.findFirstByProductId(productId);
+	private ShelfProduct getProductFromShelf(UUID productId) {
+		Optional<ShelfProduct> oProduct = shelfProductRepository.findFirstByProductId(productId);
 		ShelfProduct product = null;
 		if (oProduct.isPresent()) {
 			product = oProduct.get();
@@ -147,7 +144,7 @@ public class ProductService {
 	}
 
 	// Yeni metod: Stok miktarını azaltır.
-	public void decreaseProductStock(int productId, int count) {
+	public void decreaseProductStock(UUID productId, int count) {
 		Product product = getProduct(productId);
 		int currentStock = product.getUnitInStock();
 		int currentQuantity = product.getQuantity();
@@ -168,13 +165,12 @@ public class ProductService {
 	}
 
 	@Transactional
-	public void dispatchProduct(int productId, int count) {
+	public void dispatchProduct(UUID productId, int count) {
 
 		ShelfProduct product = getProductFromShelf(productId);
 		// increaseProductStock(productId, count); -> decrese
 
-		Optional<ShelfProduct> oShelf = shelfProductRepository
-				.findByProductIdNotFull(productId);
+		Optional<ShelfProduct> oShelf = shelfProductRepository.findByProductIdNotFull(productId);
 		if (oShelf.isPresent()) {
 
 			// yarı dolu raf bulundu.
@@ -182,9 +178,8 @@ public class ProductService {
 
 			ShelfProduct shelf = oShelf.get();
 			int dispatchCount = count;
-			int productCount = shelfProductRepository
-					.findProductCountByShelfIdAndProductId(
-							shelf.getShelf().getId(), productId);
+			int productCount = shelfProductRepository.findProductCountByShelfIdAndProductId(shelf.getShelf().getId(),
+					productId);
 
 			if (dispatchCount > productCount) {
 
@@ -197,8 +192,7 @@ public class ProductService {
 
 				// bu raftaki bu ürün bitti
 
-				shelfProductRepository.deleteProductFromShelf(
-						shelf.getShelf().getId(), productId);
+				shelfProductRepository.deleteProductFromShelf(shelf.getShelf().getId(), productId);
 
 			}
 
@@ -223,8 +217,7 @@ public class ProductService {
 	private void dispatchFromFullShelf(int count, ShelfProduct shelfProduct) {
 
 		List<ShelfProduct> fullShelves = shelfProductRepository
-				.findByProductIdAndProductCountGreaterThan(
-						shelfProduct.getProduct().getId(), 0);
+				.findByProductIdAndProductCountGreaterThan(shelfProduct.getProduct().getId(), 0);
 
 		int nextFullShelf = fullShelves.size() - 1;
 
@@ -240,9 +233,7 @@ public class ProductService {
 
 			int dispatchAmount = count;
 			int shelfProductCount = shelfProductRepository
-					.findProductCountByShelfIdAndProductId(
-							shelf.getShelf().getId(),
-							shelfProduct.getProduct().getId());
+					.findProductCountByShelfIdAndProductId(shelf.getShelf().getId(), shelfProduct.getProduct().getId());
 			if (dispatchAmount > shelfProductCount) {
 				dispatchAmount = shelfProductCount;
 			}
@@ -251,8 +242,7 @@ public class ProductService {
 			if (shelf.getProductCount() == 0) {
 				// bu raftaki bu ürün bitti
 
-				shelfProductRepository.deleteProductFromShelf(
-						shelf.getShelf().getId(),
+				shelfProductRepository.deleteProductFromShelf(shelf.getShelf().getId(),
 						shelfProduct.getProduct().getId());
 
 			}
@@ -289,8 +279,7 @@ public class ProductService {
 			// Masaüstü dizin yolunu alın
 			String desktopPath = System.getProperty("user.home") + "/Desktop/";
 
-			String timestamp = new SimpleDateFormat("yyyyMMddHHmmss")
-					.format(new Date());
+			String timestamp = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
 			String fileName = "product_report_" + timestamp + ".pdf";
 
 			// Dosya yolunu oluşturun
@@ -327,28 +316,23 @@ public class ProductService {
 				cell.setPadding(5); // Padding ayarı
 				table.addCell(cell);
 
-				cell = new PdfPCell(
-						new Phrase(product.getCategory().getName()));
+				cell = new PdfPCell(new Phrase(product.getCategory().getName()));
 				cell.setPadding(5); // Padding ayarı
 				table.addCell(cell);
 
-				cell = new PdfPCell(
-						new Phrase(Double.toString(product.getPrice())));
+				cell = new PdfPCell(new Phrase(Double.toString(product.getPrice())));
 				cell.setPadding(5); // Padding ayarı
 				table.addCell(cell);
 
-				cell = new PdfPCell(
-						new Phrase(Integer.toString(product.getQuantity())));
+				cell = new PdfPCell(new Phrase(Integer.toString(product.getQuantity())));
 				cell.setPadding(5); // Padding ayarı
 				table.addCell(cell);
 
-				cell = new PdfPCell(
-						new Phrase(Integer.toString(product.getUnitInStock())));
+				cell = new PdfPCell(new Phrase(Integer.toString(product.getUnitInStock())));
 				cell.setPadding(5); // Padding ayarı
 				table.addCell(cell);
 
-				cell = new PdfPCell(new Phrase(
-						Integer.toString(product.getMinimumCount())));
+				cell = new PdfPCell(new Phrase(Integer.toString(product.getMinimumCount())));
 				cell.setPadding(5); // Padding ayarı
 				table.addCell(cell);
 
