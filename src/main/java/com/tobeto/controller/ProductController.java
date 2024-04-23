@@ -80,7 +80,14 @@ public class ProductController {
 
 	@GetMapping("/reportProduct")
 	public SuccessResponseDTO generateProductReportAndPDF() {
-		productService.transferProductsToReportAndGeneratePDF();
+		productService.transferProductsToReportAndGeneratePDFAllProducts();
+		return new SuccessResponseDTO("Product report generated successfully!");
+
+	}
+
+	@GetMapping("/reportProductWarningCount")
+	public SuccessResponseDTO transferProductsToReportAndGeneratePDFWarningCount() {
+		productService.transferProductsToReportAndGeneratePDFWarningCount();
 		return new SuccessResponseDTO("Product report generated successfully!");
 
 	}
