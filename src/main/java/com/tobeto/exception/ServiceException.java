@@ -24,7 +24,8 @@ public class ServiceException extends RuntimeException {
 				"You cannot set capacity less than 50 and bigger than 200"),
 		PRODUCT_STOCK_ERROR(8, "Product unit in stock less than entry count."),
 
-		USER_NOT_FOUND(9, "User not found.");
+		USER_NOT_FOUND(9, "User not found."), NOT_ENOUGH_STOCK(10,
+				"Cannot select more products than the quantity in stock.");
 
 		private int code;
 		private String message;

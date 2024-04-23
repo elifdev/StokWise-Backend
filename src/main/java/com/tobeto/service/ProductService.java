@@ -146,6 +146,27 @@ public class ProductService {
 		return product;
 	}
 
+	// Yeni metod: Stok miktarını azaltır.
+	public void decreaseProductStock(int productId, int count) {
+		Product product = getProduct(productId);
+		int currentStock = product.getUnitInStock();
+		int currentQuantity = product.getQuantity();
+
+		// Güncel stok miktarına azaltılacak miktarı çıkar
+		int newStock = currentStock - count;
+		int newQuantity = currentQuantity - count;
+
+		// Negatif stok miktarını önlemek için kontrol
+		if (newStock < 0) {
+			throw new ServiceException(ERROR_CODES.NOT_ENOUGH_STOCK);
+		}
+
+		// Yeni stok miktarını güncelle
+		product.setUnitInStock(newStock);
+		product.setQuantity(newQuantity);
+		productRepository.save(product);
+	}
+
 	@Transactional
 	public void dispatchProduct(int productId, int count) {
 
@@ -181,6 +202,7 @@ public class ProductService {
 
 			}
 
+			decreaseProductStock(productId, dispatchCount);
 			shelfProductRepository.save(shelf);
 			count -= dispatchCount;
 
@@ -192,6 +214,8 @@ public class ProductService {
 		if (count > 0) {
 
 			dispatchFromFullShelf(count, product);
+			decreaseProductStock(productId, count);
+
 		}
 
 	}
@@ -242,16 +266,37 @@ public class ProductService {
 	}
 
 	@Transactional
-	public void transferProductsToReportAndGeneratePDF() {
+	public void transferProductsToReportAndGeneratePDFAllProducts() {
 		List<Product> products = productRepository.findAll();
+		generatePDF(products);
+	}
 
+	@Transactional
+	public void transferProductsToReportAndGeneratePDFWarningCount() {
+		List<Product> products = productRepository.findAll();
+		List<Product> warningProducts = new ArrayList<>();
+		for (Product product : products) {
+			if (product.getMinimumCount() >= product.getQuantity()) {
+				warningProducts.add(product);
+			}
+		}
+		generatePDF(warningProducts);
+	}
+
+	private void generatePDF(List<Product> products) {
 		Document document = new Document();
 		try {
+			// Masaüstü dizin yolunu alın
+			String desktopPath = System.getProperty("user.home") + "/Desktop/";
+
 			String timestamp = new SimpleDateFormat("yyyyMMddHHmmss")
 					.format(new Date());
 			String fileName = "product_report_" + timestamp + ".pdf";
 
-			PdfWriter.getInstance(document, new FileOutputStream(fileName));
+			// Dosya yolunu oluşturun
+			String filePath = desktopPath + fileName;
+
+			PdfWriter.getInstance(document, new FileOutputStream(filePath));
 			document.setPageSize(PageSize.A4.rotate());
 			document.open();
 			// Maksimum 30 ürün içeren tabloları tutmak için bir liste oluşturun

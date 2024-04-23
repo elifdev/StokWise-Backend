@@ -179,4 +179,8 @@ public class ShelfService {
 		}
 	}
 
+	public List<ShelfProduct> getAllProductsFromShelf(int shelfId) {
+		return shelfProductRepository.findByShelfId(shelfId);
+	}
+
 }

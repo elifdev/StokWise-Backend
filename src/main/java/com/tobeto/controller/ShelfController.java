@@ -18,8 +18,11 @@ import com.tobeto.dto.SuccessResponseDTO;
 import com.tobeto.dto.product.ProductDTO;
 import com.tobeto.dto.product.request.DispatchProductRequestDTO;
 import com.tobeto.dto.product.request.EntryProductRequestDTO;
+import com.tobeto.dto.product.response.ProductResponseDTO;
 import com.tobeto.dto.shelf.ShelfDTO;
 import com.tobeto.dto.shelf.request.AddShelfRequestDTO;
+import com.tobeto.dto.shelf.request.TableShelfRequestDTO;
+import com.tobeto.dto.shelf.response.TableShelfResponseDTO;
 import com.tobeto.dto.shelfProduct.request.DeleteShelfProductRequestDTO;
 import com.tobeto.dto.shelfProduct.request.UpdateShelfProductRequestDTO;
 import com.tobeto.entities.warehouse.Product;
@@ -28,6 +31,8 @@ import com.tobeto.entities.warehouse.ShelfProduct;
 import com.tobeto.exception.ServiceException;
 import com.tobeto.service.ProductService;
 import com.tobeto.service.ShelfService;
+
+import jakarta.transaction.Transactional;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -100,17 +105,11 @@ public class ShelfController {
 	}
 
 	@PostMapping("/entryProduct")
-	public ResponseEntity<String> entryProduct(
+	public SuccessResponseDTO entryProduct(
 			@RequestBody EntryProductRequestDTO request) {
-		try {
-			shelfService.entryProduct(request.getProductId(),
-					request.getCount());
-			return ResponseEntity
-					.ok("Product added successfully on the shelf!");
-		} catch (ServiceException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body(e.getMessage());
-		}
+		shelfService.entryProduct(request.getProductId(), request.getCount());
+		return new SuccessResponseDTO("Shelf entry successfully!");
+
 	}
 
 	// ÜRÜN ÇIKIŞI
@@ -124,6 +123,42 @@ public class ShelfController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 					.body(e.getMessage());
 		}
+	}
+
+	@Transactional
+	@PostMapping("/getAllProductsFromShelf")
+	public List<ProductResponseDTO> getAllProductsFromShelf(
+			@RequestBody TableShelfRequestDTO dto) {
+
+		List<ShelfProduct> shelfProducts = shelfService
+				.getAllProductsFromShelf(dto.getId());
+		return shelfProducts.stream().map(sp -> {
+			ProductResponseDTO productDTO = new ProductResponseDTO();
+			productDTO.setId(sp.getProduct().getId());
+			productDTO.setCount(sp.getProductCount());
+			productDTO.setName(sp.getProduct().getName());
+			return productDTO;
+		}).toList();
+
+	}
+
+	@Transactional
+	@GetMapping("/getAllTableShelves")
+	public List<TableShelfResponseDTO> getAllTableShelves() {
+		List<Shelf> shelves = shelfService.getAllShelves();
+		return shelves.stream().map(sh -> {
+			TableShelfResponseDTO dto = new TableShelfResponseDTO();
+			dto.setId(sh.getId());
+			dto.setCapacity(sh.getCapacity());
+			int sumProductCount = sh.getShelfProducts().stream()
+					.mapToInt(sp -> sp.getProductCount()).sum();
+			dto.setProductCount(sumProductCount);
+			if (sh.getShelfProducts().size() > 0) {
+				dto.setProductCategory(sh.getShelfProducts().get(0).getProduct()
+						.getCategory().getName());
+			}
+			return dto;
+		}).toList();
 	}
 
 }

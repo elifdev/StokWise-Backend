@@ -78,10 +78,17 @@ public class ProductController {
 		return new SuccessResponseDTO("Product updated!");
 	}
 
-	@GetMapping("/generate-report")
-	public String generateProductReportAndPDF() {
-		productService.transferProductsToReportAndGeneratePDF();
-		return "Product report generated successfully!";
+	@GetMapping("/reportProduct")
+	public SuccessResponseDTO generateProductReportAndPDF() {
+		productService.transferProductsToReportAndGeneratePDFAllProducts();
+		return new SuccessResponseDTO("Product report generated successfully!");
+
+	}
+
+	@GetMapping("/reportProductWarningCount")
+	public SuccessResponseDTO transferProductsToReportAndGeneratePDFWarningCount() {
+		productService.transferProductsToReportAndGeneratePDFWarningCount();
+		return new SuccessResponseDTO("Product report generated successfully!");
 
 	}
 
