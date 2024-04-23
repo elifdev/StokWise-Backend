@@ -266,12 +266,26 @@ public class ProductService {
 	}
 
 	@Transactional
-	public void transferProductsToReportAndGeneratePDF() {
+	public void transferProductsToReportAndGeneratePDFAllProducts() {
 		List<Product> products = productRepository.findAll();
+		generatePDF(products);
+	}
 
+	@Transactional
+	public void transferProductsToReportAndGeneratePDFWarningCount() {
+		List<Product> products = productRepository.findAll();
+		List<Product> warningProducts = new ArrayList<>();
+		for (Product product : products) {
+			if (product.getMinimumCount() >= product.getQuantity()) {
+				warningProducts.add(product);
+			}
+		}
+		generatePDF(warningProducts);
+	}
+
+	private void generatePDF(List<Product> products) {
 		Document document = new Document();
 		try {
-
 			// Masaüstü dizin yolunu alın
 			String desktopPath = System.getProperty("user.home") + "/Desktop/";
 
