@@ -2,6 +2,7 @@ package com.tobeto.repository.warehouse;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -11,18 +12,17 @@ import com.tobeto.entities.warehouse.ShelfProduct;
 
 import jakarta.transaction.Transactional;
 
-public interface ShelfProductRepository
-		extends JpaRepository<ShelfProduct, Integer> {
-	List<ShelfProduct> findByShelfId(int id);
+public interface ShelfProductRepository extends JpaRepository<ShelfProduct, UUID> {
+	List<ShelfProduct> findByShelfId(UUID id);
 
-	Optional<ShelfProduct> findFirstByProductId(int id);
+	Optional<ShelfProduct> findFirstByProductId(UUID id);
 
 	@Query("SELECT sp.product.id, SUM(sp.productCount) AS total_product_count, p.name FROM ShelfProduct sp INNER JOIN sp.product p GROUP BY sp.product.id, p.name ORDER BY sp.product.id")
 	List<Object[]> getAllProductsFromShelves();
 
 	// gelen raf id si içinde o üründen kaç tane var ona bakıyor
 	@Query("SELECT sp.productCount FROM ShelfProduct sp WHERE sp.shelf.id = :shelfId AND sp.product.id = :productId")
-	int findProductCountByShelfIdAndProductId(int shelfId, int productId);
+	int findProductCountByShelfIdAndProductId(UUID shelfId, UUID productId);
 
 	// gönderim yapmak istediğimiz ürünün id si ile içinde istenilen ürün olan
 	// ve
@@ -39,16 +39,16 @@ public interface ShelfProductRepository
 //	Optional<ShelfProduct> findByProductIdNotFull(int productId);
 
 	@Query("SELECT sp FROM ShelfProduct sp JOIN sp.shelf shelf WHERE sp.product.id = :productId GROUP BY sp.id, shelf.id HAVING SUM(sp.productCount) < MAX(shelf.capacity) ORDER BY SUM(sp.productCount) ASC LIMIT 1")
-	Optional<ShelfProduct> findByProductIdNotFull(int productId);
+	Optional<ShelfProduct> findByProductIdNotFull(UUID productId);
 
 	@Query("SELECT sp FROM ShelfProduct sp WHERE sp.product.id = :productId ORDER BY sp.productCount ASC")
-	Optional<ShelfProduct> findByProductIdOrderByProductCountAsc(int productId);
+	Optional<ShelfProduct> findByProductIdOrderByProductCountAsc(UUID productId);
 
 	// gelen id'li rafta id'si verilen ürünü raftan çıkar
 	@Transactional
 	@Modifying
 	@Query("DELETE FROM ShelfProduct sp WHERE sp.shelf.id = :shelfId AND sp.product.id = :productId")
-	void deleteProductFromShelf(int shelfId, int productId);
+	void deleteProductFromShelf(UUID shelfId, UUID productId);
 
 	// istenilen idli ürünün olduğu rafları buluyor ve girilen miktardan fazla
 	// olanları listeliyor.
@@ -56,7 +56,6 @@ public interface ShelfProductRepository
 	// burada ürün sayısı az olandan çok olana göre sırala
 
 	@Query("SELECT sp FROM ShelfProduct sp WHERE sp.product.id = :productId AND sp.productCount > :count ORDER BY sp.productCount DESC")
-	List<ShelfProduct> findByProductIdAndProductCountGreaterThan(int productId,
-			int count);
+	List<ShelfProduct> findByProductIdAndProductCountGreaterThan(UUID productId, int count);
 
 }
