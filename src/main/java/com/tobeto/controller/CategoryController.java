@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.tobeto.dto.SuccessResponseDTO;
 import com.tobeto.dto.category.CategoryDTO;
 import com.tobeto.dto.category.GetAllCategories;
+import com.tobeto.dto.category.request.DeleteCategoryRequestDTO;
+import com.tobeto.dto.category.request.UpdateCategoryRequestDTO;
 import com.tobeto.entities.warehouse.Category;
 import com.tobeto.service.CategoryService;
 
@@ -54,10 +56,16 @@ public class CategoryController {
 	}
 
 	@PostMapping("/deleteCategory")
-	public SuccessResponseDTO deleteCategory(@RequestBody CategoryDTO categoryDTO) {
-		Category category = requestMapper.map(categoryDTO, Category.class);
-		categoryService.deleteCategory(category);
+	public SuccessResponseDTO deleteCategory(@RequestBody DeleteCategoryRequestDTO deleteCategoryRequestDTO) {
+		categoryService.deleteCategory(deleteCategoryRequestDTO.getId());
 		return new SuccessResponseDTO("Category deleted!");
+
+	}
+
+	@PostMapping("/editCategory")
+	public SuccessResponseDTO editCategory(@RequestBody UpdateCategoryRequestDTO updateCategoryRequestDTO) {
+		categoryService.editCategory(updateCategoryRequestDTO.getId(), updateCategoryRequestDTO.getName());
+		return new SuccessResponseDTO("Category updated!");
 
 	}
 
