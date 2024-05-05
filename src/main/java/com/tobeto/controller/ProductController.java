@@ -1,11 +1,15 @@
 package com.tobeto.controller;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -47,48 +51,58 @@ public class ProductController {
 		List<Product> allProducts = productService.getAllProducts();
 		List<GetAllProductsResponseDTO> allProductsDTO = new ArrayList<>();
 		allProducts.forEach(product -> {
-			allProductsDTO.add(responseMapper.map(product,
-					GetAllProductsResponseDTO.class));
+			allProductsDTO.add(responseMapper.map(product, GetAllProductsResponseDTO.class));
 		});
 		return ResponseEntity.ok(allProductsDTO);
 	}
 
 	@PostMapping("/addProduct")
-	public SuccessResponseDTO addProduct(
-			@RequestBody AddProductRequestDTO addProductRequestDTO) {
-		Product product = requestMapper.map(addProductRequestDTO,
-				Product.class);
+	public SuccessResponseDTO addProduct(@RequestBody AddProductRequestDTO addProductRequestDTO) {
+		Product product = requestMapper.map(addProductRequestDTO, Product.class);
 		productService.addProduct(product);
 		return new SuccessResponseDTO("Product created!");
 	}
 
 	@PostMapping("/deleteProduct")
-	public SuccessResponseDTO deleteProduct(
-			@RequestBody DeleteProductRequestDTO deleteProductRequestDTO) {
+	public SuccessResponseDTO deleteProduct(@RequestBody DeleteProductRequestDTO deleteProductRequestDTO) {
 		productService.deleteProduct(deleteProductRequestDTO.getId());
 		return new SuccessResponseDTO("Product deleted successfuly!");
 	}
 
 	@PostMapping("/updateProduct")
-	public SuccessResponseDTO editProduct(
-			@RequestBody EditProductRequestDTO editProductRequestDTO) {
-		Product product = requestMapper.map(editProductRequestDTO,
-				Product.class);
+	public SuccessResponseDTO editProduct(@RequestBody EditProductRequestDTO editProductRequestDTO) {
+		Product product = requestMapper.map(editProductRequestDTO, Product.class);
 		productService.updateProduct(product);
 		return new SuccessResponseDTO("Product updated!");
 	}
 
 	@GetMapping("/reportProduct")
-	public SuccessResponseDTO generateProductReportAndPDF() {
-		productService.transferProductsToReportAndGeneratePDFAllProducts();
-		return new SuccessResponseDTO("Product report generated successfully!");
+	public ResponseEntity<byte[]> generateProductReportAndPDF() {
+		ByteArrayOutputStream out = productService.transferProductsToReportAndGeneratePDFAllProducts();
+		byte[] pdfBytes = out.toByteArray();
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.parseMediaType("application/pdf"));
+		// Here you have to set the actual filename of your pdf
+		String filename = "product_report.pdf";
+		headers.setContentDispositionFormData(filename, filename);
+		headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
+		ResponseEntity<byte[]> respons = new ResponseEntity<byte[]>(pdfBytes, headers, HttpStatus.OK);
+		return respons;
 
 	}
 
 	@GetMapping("/reportProductWarningCount")
-	public SuccessResponseDTO transferProductsToReportAndGeneratePDFWarningCount() {
-		productService.transferProductsToReportAndGeneratePDFWarningCount();
-		return new SuccessResponseDTO("Product report generated successfully!");
+	public ResponseEntity<byte[]> transferProductsToReportAndGeneratePDFWarningCount() {
+		ByteArrayOutputStream out = productService.transferProductsToReportAndGeneratePDFWarningCount();
+		byte[] pdfBytes = out.toByteArray();
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.parseMediaType("application/pdf"));
+		// Here you have to set the actual filename of your pdf
+		String filename = "product_min_report.pdf";
+		headers.setContentDispositionFormData(filename, filename);
+		headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
+		ResponseEntity<byte[]> respons = new ResponseEntity<byte[]>(pdfBytes, headers, HttpStatus.OK);
+		return respons;
 
 	}
 

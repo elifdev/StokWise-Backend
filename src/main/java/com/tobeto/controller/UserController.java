@@ -52,21 +52,24 @@ public class UserController {
 		List<User> users = userService.getAllUser();
 		List<GetAllUsersResponseDTO> userDTOs = new ArrayList<>();
 		users.forEach(user -> {
-			userDTOs.add(
-					responseMapper.map(user, GetAllUsersResponseDTO.class));
+			userDTOs.add(responseMapper.map(user, GetAllUsersResponseDTO.class));
 		});
 		return ResponseEntity.ok(userDTOs);
 
 	}
 
-	@PostMapping("/user/signup")
-	public ResponseEntity<SignupResponseDTO> userSignUp(
-			@Validated @RequestBody SignupRequestDTO signupRequestDTO) {
+	@PostMapping("/addUser")
+	public ResponseEntity<SignupResponseDTO> userSignUp(@Validated @RequestBody SignupRequestDTO signupRequestDTO) {
 
-		User user = loginService.userSignUp(signupRequestDTO.getEmail(),
-				signupRequestDTO.getPassword());
-		String token = tokenService.createToken(user);
-		return ResponseEntity.ok(new SignupResponseDTO(token));
+		/*
+		 * User user = loginService.adminSignUp(signupRequestDTO.getEmail(),
+		 * signupRequestDTO.getPassword(), signupRequestDTO.getRoles()); String token =
+		 * tokenService.createToken(user); return ResponseEntity.ok(new
+		 * SignupResponseDTO(token));
+		 */
+		String token = loginService.userSignUp(signupRequestDTO.getEmail(), signupRequestDTO.getPassword(),
+				signupRequestDTO.getRoles());
+		return ResponseEntity.ok(new SignupResponseDTO(token)); // SignupResponseDTO ile cevap dön
 	}
 
 	@PostMapping("/user/update")
@@ -85,14 +88,11 @@ public class UserController {
 	}
 
 	@PostMapping("/changePassword")
-	public ResponseEntity<SuccessResponseDTO> sifreDegistir(
-			@RequestBody ChangePasswordUserRequestDTO dto,
+	public ResponseEntity<SuccessResponseDTO> sifreDegistir(@RequestBody ChangePasswordUserRequestDTO dto,
 			Principal principal) {
-		boolean result = userService.changePassword(dto.getOldPassword(),
-				dto.getNewPassword(), principal.getName());
+		boolean result = userService.changePassword(dto.getOldPassword(), dto.getNewPassword(), principal.getName());
 		if (result) {
-			return ResponseEntity.ok(
-					new SuccessResponseDTO("Password successfully changed."));
+			return ResponseEntity.ok(new SuccessResponseDTO("Password successfully changed."));
 		} else {
 			return ResponseEntity.internalServerError().build();
 		}

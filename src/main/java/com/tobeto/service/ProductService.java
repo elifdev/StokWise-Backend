@@ -1,10 +1,7 @@
 package com.tobeto.service;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -256,13 +253,13 @@ public class ProductService {
 	}
 
 	@Transactional
-	public void transferProductsToReportAndGeneratePDFAllProducts() {
+	public ByteArrayOutputStream transferProductsToReportAndGeneratePDFAllProducts() {
 		List<Product> products = productRepository.findAll();
-		generatePDF(products);
+		return generatePDF(products);
 	}
 
 	@Transactional
-	public void transferProductsToReportAndGeneratePDFWarningCount() {
+	public ByteArrayOutputStream transferProductsToReportAndGeneratePDFWarningCount() {
 		List<Product> products = productRepository.findAll();
 		List<Product> warningProducts = new ArrayList<>();
 		for (Product product : products) {
@@ -270,22 +267,26 @@ public class ProductService {
 				warningProducts.add(product);
 			}
 		}
-		generatePDF(warningProducts);
+		return generatePDF(warningProducts);
 	}
 
-	private void generatePDF(List<Product> products) {
+	private ByteArrayOutputStream generatePDF(List<Product> products) {
 		Document document = new Document();
 		try {
-			// Masaüstü dizin yolunu alın
-			String desktopPath = System.getProperty("user.home") + "/Desktop/";
+//			// Masaüstü dizin yolunu alın
+//			String desktopPath = System.getProperty("user.home") + "/Desktop/";
+//
+//			String timestamp = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+//			String fileName = "product_report_" + timestamp + ".pdf";
+//
+//			// Dosya yolunu oluşturun
+//			String filePath = desktopPath + fileName;
+//
+//			PdfWriter.getInstance(document, new FileOutputStream(filePath));
 
-			String timestamp = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
-			String fileName = "product_report_" + timestamp + ".pdf";
+			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+			PdfWriter.getInstance(document, byteArrayOutputStream);
 
-			// Dosya yolunu oluşturun
-			String filePath = desktopPath + fileName;
-
-			PdfWriter.getInstance(document, new FileOutputStream(filePath));
 			document.setPageSize(PageSize.A4.rotate());
 			document.open();
 			// Maksimum 30 ürün içeren tabloları tutmak için bir liste oluşturun
@@ -312,32 +313,33 @@ public class ProductService {
 				}
 
 				// Her hücre için bir PdfPCell oluşturun ve padding ekleyin
-				PdfPCell cell = new PdfPCell(new Phrase(product.getName()));
+				PdfPCell cell = new PdfPCell(new Phrase(turkishCharConvert(product.getName())));
+				System.out.println(product.getName());
 				cell.setPadding(5); // Padding ayarı
 				table.addCell(cell);
 
-				cell = new PdfPCell(new Phrase(product.getCategory().getName()));
-				cell.setPadding(5); // Padding ayarı
+				cell = new PdfPCell(new Phrase(turkishCharConvert(product.getCategory().getName())));
+				cell.setPadding(5);
 				table.addCell(cell);
 
 				cell = new PdfPCell(new Phrase(Double.toString(product.getPrice())));
-				cell.setPadding(5); // Padding ayarı
+				cell.setPadding(5);
 				table.addCell(cell);
 
 				cell = new PdfPCell(new Phrase(Integer.toString(product.getQuantity())));
-				cell.setPadding(5); // Padding ayarı
+				cell.setPadding(5);
 				table.addCell(cell);
 
 				cell = new PdfPCell(new Phrase(Integer.toString(product.getUnitInStock())));
-				cell.setPadding(5); // Padding ayarı
+				cell.setPadding(5);
 				table.addCell(cell);
 
 				cell = new PdfPCell(new Phrase(Integer.toString(product.getMinimumCount())));
-				cell.setPadding(5); // Padding ayarı
+				cell.setPadding(5);
 				table.addCell(cell);
 
-				cell = new PdfPCell(new Phrase(product.getDescription()));
-				cell.setPadding(5); // Padding ayarı
+				cell = new PdfPCell(new Phrase(turkishCharConvert(product.getDescription())));
+				cell.setPadding(5);
 				table.addCell(cell);
 
 				count++;
@@ -355,11 +357,19 @@ public class ProductService {
 				document.newPage();
 			}
 
-		} catch (DocumentException | IOException e) {
+			return byteArrayOutputStream;
+		} catch (DocumentException e) {
 			e.printStackTrace();
 		} finally {
 			document.close();
 		}
+		return null;
+	}
+
+	private String turkishCharConvert(String val) {
+		return val.replace("ı", "i").replace("ş", "s").replace("ö", "o").replace("ğ", "g").replace("ü", "u")
+				.replace("ç", "c").replace("Ğ", "G").replace("Ü", "U").replace("Ş", "S").replace("İ", "I")
+				.replace("Ö", "O").replace("Ç", "C");
 	}
 
 }
