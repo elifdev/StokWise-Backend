@@ -23,7 +23,6 @@ import com.tobeto.dto.user.GetAllUsersResponseDTO;
 import com.tobeto.dto.user.UserDTO;
 import com.tobeto.entities.user.User;
 import com.tobeto.service.LoginService;
-import com.tobeto.service.TokenService;
 import com.tobeto.service.UserService;
 
 @RestController
@@ -35,9 +34,6 @@ public class UserController {
 
 	@Autowired
 	private LoginService loginService;
-
-	@Autowired
-	private TokenService tokenService;
 
 	@Autowired
 	@Qualifier("requestMapper")
@@ -52,21 +48,17 @@ public class UserController {
 		List<User> users = userService.getAllUser();
 		List<GetAllUsersResponseDTO> userDTOs = new ArrayList<>();
 		users.forEach(user -> {
-			userDTOs.add(
-					responseMapper.map(user, GetAllUsersResponseDTO.class));
+			userDTOs.add(responseMapper.map(user, GetAllUsersResponseDTO.class));
 		});
 		return ResponseEntity.ok(userDTOs);
 
 	}
 
-	@PostMapping("/user/signup")
-	public ResponseEntity<SignupResponseDTO> userSignUp(
-			@Validated @RequestBody SignupRequestDTO signupRequestDTO) {
-
-		User user = loginService.userSignUp(signupRequestDTO.getEmail(),
-				signupRequestDTO.getPassword());
-		String token = tokenService.createToken(user);
-		return ResponseEntity.ok(new SignupResponseDTO(token));
+	@PostMapping("/addUser")
+	public ResponseEntity<SignupResponseDTO> userSignUp(@Validated @RequestBody SignupRequestDTO signupRequestDTO) {
+		String token = loginService.userSignUp(signupRequestDTO.getEmail(), signupRequestDTO.getPassword(),
+				signupRequestDTO.getRoles());
+		return ResponseEntity.ok(new SignupResponseDTO(token)); // SignupResponseDTO ile cevap dön
 	}
 
 	@PostMapping("/user/update")
@@ -85,14 +77,11 @@ public class UserController {
 	}
 
 	@PostMapping("/changePassword")
-	public ResponseEntity<SuccessResponseDTO> sifreDegistir(
-			@RequestBody ChangePasswordUserRequestDTO dto,
+	public ResponseEntity<SuccessResponseDTO> sifreDegistir(@RequestBody ChangePasswordUserRequestDTO dto,
 			Principal principal) {
-		boolean result = userService.changePassword(dto.getOldPassword(),
-				dto.getNewPassword(), principal.getName());
+		boolean result = userService.changePassword(dto.getOldPassword(), dto.getNewPassword(), principal.getName());
 		if (result) {
-			return ResponseEntity.ok(
-					new SuccessResponseDTO("Password successfully changed."));
+			return ResponseEntity.ok(new SuccessResponseDTO("Password successfully changed."));
 		} else {
 			return ResponseEntity.internalServerError().build();
 		}
