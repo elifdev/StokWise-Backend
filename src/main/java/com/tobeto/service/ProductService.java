@@ -16,6 +16,7 @@ import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfPCell;
@@ -260,7 +261,7 @@ public class ProductService {
 	@Transactional
 	public ByteArrayOutputStream transferProductsToReportAndGeneratePDFAllProducts() {
 		List<Product> products = productRepository.findAll();
-		return generatePDF(products, "All Products Report");
+		return generatePDF(products, "All Products Report", "All products in the inventory");
 	}
 
 	@Transactional
@@ -272,10 +273,26 @@ public class ProductService {
 				warningProducts.add(product);
 			}
 		}
-		return generatePDF(warningProducts, "Low Stock Alert Report");
+
+//		// Uyarı ürünleri listesi boşsa, özel bir mesaj içeren PDF oluştur
+//		if (warningProducts.isEmpty()) {
+//			return generateEmptyPDF("Minimum Count altında ürün yoktur");
+//		}
+
+//		return generatePDF(warningProducts, "Low Stock Alert Report");
+
+		// Uyarı ürünleri listesi boşsa, özel bir mesaj içeren PDF oluştur
+		String message = "There Are No Products Under The Minimum Count";
+		String title = "Low Stock Alert Report";
+		if (warningProducts.isEmpty()) {
+			return generateEmptyPDF(message);
+		}
+
+		return generatePDF(warningProducts, title, "Products under the minimum count");
+
 	}
 
-	private ByteArrayOutputStream generatePDF(List<Product> products, String title) {
+	private ByteArrayOutputStream generatePDF(List<Product> products, String title, String message) {
 		Document document = new Document();
 		try {
 //			// Masaüstü dizin yolunu alın
@@ -387,6 +404,29 @@ public class ProductService {
 				// Yeni bir sayfa ekleyin
 				document.newPage();
 			}
+
+			return byteArrayOutputStream;
+		} catch (DocumentException e) {
+			e.printStackTrace();
+		} finally {
+			document.close();
+		}
+		return null;
+	}
+
+	private ByteArrayOutputStream generateEmptyPDF(String message) {
+		Document document = new Document();
+		try {
+			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+			PdfWriter.getInstance(document, byteArrayOutputStream);
+
+			document.setPageSize(PageSize.A4.rotate());
+			document.open();
+
+			// Mesajı içeren bir paragraf oluştur
+			Paragraph paragraph = new Paragraph(message, new Font(Font.FontFamily.HELVETICA, 12, Font.NORMAL));
+			paragraph.setAlignment(Element.ALIGN_CENTER);
+			document.add(paragraph);
 
 			return byteArrayOutputStream;
 		} catch (DocumentException e) {
