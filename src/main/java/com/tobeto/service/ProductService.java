@@ -90,8 +90,23 @@ public class ProductService {
 		return productRepository.save(product);
 	}
 
+//	public void deleteProduct(UUID id) {
+//		productRepository.deleteById(id);
+//	}
+
 	public void deleteProduct(UUID id) {
-		productRepository.deleteById(id);
+		
+		Optional<Product> productOptional = productRepository.findById(id);
+
+		if (productOptional.isPresent()) {
+			Product product = productOptional.get();
+			if (product.getQuantity() == 0) {
+
+				productRepository.deleteById(id);
+			} else {
+				throw new ServiceException(ERROR_CODES.PRODUCT_QUANTİTY_EROR);
+			}
+		}
 	}
 
 	///////////////// BURADAN SONRASI EKLENDİ
