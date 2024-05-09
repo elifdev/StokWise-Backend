@@ -18,14 +18,11 @@ public class UserService {
 	@Autowired
 	private UserRepository userRepository;
 
-//	@Autowired
-//	private PasswordEncoder passwordEncoder;
-
 	public List<User> getAllUser() {
 		List<User> allUsers = userRepository.findAll();
 		allUsers.forEach(u -> {
 			List<Role> roles = userRepository.findRolesByEmail(u.getEmail());
-//			System.out.println(roles);
+
 			u.setRoles(roles);
 		});
 
@@ -65,8 +62,7 @@ public class UserService {
 		}
 	}
 
-	public boolean changePassword(String oldPassword, String newPassword,
-			String email) {
+	public boolean changePassword(String oldPassword, String newPassword, String email) {
 		Optional<User> oUser = userRepository.findByEmail(email);
 		if (oUser.isPresent()) {
 			User dbUser = oUser.get();
@@ -78,9 +74,5 @@ public class UserService {
 		}
 		return false;
 	}
-
-//	public List<Role> getUserRolesByEmail(String email) {
-//		return userRepository.findRolesByEmail(email);
-//	}
 
 }
