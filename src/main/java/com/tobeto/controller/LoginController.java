@@ -14,6 +14,8 @@ import com.tobeto.service.LoginService;
 import com.tobeto.service.TokenService;
 import com.tobeto.service.UserService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/v1")
 public class LoginController {
@@ -28,7 +30,8 @@ public class LoginController {
 	private LoginService loginService;
 
 	@PostMapping("/login")
-	public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO loginRequestDTO) {
+	public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody LoginRequestDTO loginRequestDTO) {
+
 		try {
 			String token = loginService.login(loginRequestDTO.getEmail(), loginRequestDTO.getPassword());
 			return ResponseEntity.ok(new LoginResponseDTO(token));
