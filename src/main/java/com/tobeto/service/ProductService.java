@@ -95,7 +95,7 @@ public class ProductService {
 //	}
 
 	public void deleteProduct(UUID id) {
-		
+
 		Optional<Product> productOptional = productRepository.findById(id);
 
 		if (productOptional.isPresent()) {
@@ -438,10 +438,28 @@ public class ProductService {
 			document.setPageSize(PageSize.A4.rotate());
 			document.open();
 
+			String dateStr = new SimpleDateFormat("dd-MM-yyyy").format(new Date());
+
+			PdfPTable table = null;
+
+			table = new PdfPTable(7); // 7 sütun
+			table.setWidthPercentage(100);
+			table.setSpacingBefore(10); // Tablo öncesi boşluk
+
+			// Tarih hücresini ekleyin
+			PdfPCell dateCell = new PdfPCell(new Phrase("Report Date: " + dateStr));
+			dateCell.setColspan(7);
+			dateCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+			dateCell.setBorder(Rectangle.NO_BORDER);
+			dateCell.setPadding(5);
+			table.addCell(dateCell);
+
 			// Mesajı içeren bir paragraf oluştur
-			Paragraph paragraph = new Paragraph(message, new Font(Font.FontFamily.HELVETICA, 12, Font.NORMAL));
+			Paragraph paragraph = new Paragraph(message, new Font(Font.FontFamily.HELVETICA, 16, Font.NORMAL));
 			paragraph.setAlignment(Element.ALIGN_CENTER);
 			document.add(paragraph);
+
+			document.add(table);
 
 			return byteArrayOutputStream;
 		} catch (DocumentException e) {
