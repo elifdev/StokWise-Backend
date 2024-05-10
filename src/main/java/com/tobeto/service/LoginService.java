@@ -116,10 +116,10 @@ public class LoginService {
 
 	public String userSignUp(String email, String password, List<RoleDTO> roleDTOs) {
 		User user = new User();
-		// List<Role> userRole = roleRepository.findAll();
+
 		user.setEmail(email);
-		user.setPassword(password);// password encrypt
-// edilecek
+		user.setPassword(password);
+
 		List<Role> roles = roleDTOs.stream()
 				.map(roleDto -> roleRepository.findByName(roleDto.getName())
 						.orElseThrow(() -> new RuntimeException("Role not found: " + roleDto.getName()))) // Rol
