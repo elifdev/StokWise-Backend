@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.tobeto.entities.user.Role;
@@ -17,6 +18,9 @@ public class UserService {
 
 	@Autowired
 	private UserRepository userRepository;
+
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
 	public List<User> getAllUser() {
 		List<User> allUsers = userRepository.findAll();
@@ -42,7 +46,7 @@ public class UserService {
 		if (oUser.isPresent()) {
 			User dbUser = oUser.get();
 			dbUser.setEmail(user.getEmail());
-			dbUser.setPassword(user.getPassword());
+			dbUser.setPassword(passwordEncoder.encode(user.getPassword())); // Parola şifreleme
 
 			//
 			List<Role> updatedRoles = user.getRoles();
@@ -66,8 +70,10 @@ public class UserService {
 		Optional<User> oUser = userRepository.findByEmail(email);
 		if (oUser.isPresent()) {
 			User dbUser = oUser.get();
-			if (oldPassword.equals(dbUser.getPassword())) {
-				dbUser.setPassword(newPassword);
+			// Veritabanındaki şifre ile girilen eski şifre karşılaştırılıyor
+			if (passwordEncoder.matches(oldPassword, dbUser.getPassword())) {
+				// Eski şifre doğruysa, yeni şifreyi şifrele ve güncelle
+				dbUser.setPassword(passwordEncoder.encode(newPassword));
 				userRepository.save(dbUser);
 				return true;
 			}
