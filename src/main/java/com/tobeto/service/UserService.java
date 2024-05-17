@@ -1,5 +1,6 @@
 package com.tobeto.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -77,14 +78,19 @@ public class UserService {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		String authenticatedEmail = authentication.getName();
 
-		User dUser = userRepository.findByEmailAndDeletedFalse(user.getEmail())
-				.orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+//		User dUser = userRepository.findByEmailAndIsDeletedFalse(user.getEmail())
+//				.orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+
+		User dUser = userRepository.findByEmail(user.getEmail()).orElseThrow();
 
 		if (dUser.getEmail().equals(authenticatedEmail)) {
 			throw new RuntimeException("ADMİN KENDİNİ SİLEMEZ");
 		}
 
-		userRepository.softDeleteByEmail(user.getEmail());
+		dUser.setDeleted(true);
+		dUser.setDeletedAt(LocalDateTime.now());
+
+		userRepository.save(dUser);
 	}
 
 	public boolean changePassword(String oldPassword, String newPassword, String email) {
