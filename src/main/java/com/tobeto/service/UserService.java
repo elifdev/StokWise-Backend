@@ -8,6 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.tobeto.entities.user.Role;
 import com.tobeto.entities.user.User;
@@ -25,7 +26,7 @@ public class UserService {
 	private PasswordEncoder passwordEncoder;
 
 	public List<User> getAllUser() {
-		List<User> allUsers = userRepository.findAll();
+		List<User> allUsers = userRepository.findAllActive();
 		allUsers.forEach(u -> {
 			List<Role> roles = userRepository.findRolesByEmail(u.getEmail());
 
@@ -61,14 +62,29 @@ public class UserService {
 		}
 	}
 
+//	public void deleteUser(User user) {
+//		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//		String authenticatedEmail = authentication.getName();
+//		User dUser = userRepository.findByEmail(user.getEmail()).orElseThrow();
+//		if (dUser.getEmail().equals(authenticatedEmail)) {
+//			throw new RuntimeException("ADMİN KENDİNİ SİLEMEZ");
+//		}
+//		userRepository.delete(dUser);
+//	}
+
+	@Transactional
 	public void deleteUser(User user) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		String authenticatedEmail = authentication.getName();
-		User dUser = userRepository.findByEmail(user.getEmail()).orElseThrow();
+
+		User dUser = userRepository.findByEmailAndDeletedFalse(user.getEmail())
+				.orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+
 		if (dUser.getEmail().equals(authenticatedEmail)) {
 			throw new RuntimeException("ADMİN KENDİNİ SİLEMEZ");
 		}
-		userRepository.delete(dUser);
+
+		userRepository.softDeleteByEmail(user.getEmail());
 	}
 
 	public boolean changePassword(String oldPassword, String newPassword, String email) {
