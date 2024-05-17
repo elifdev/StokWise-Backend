@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -60,10 +62,13 @@ public class UserService {
 	}
 
 	public void deleteUser(User user) {
-		Optional<User> dbUser = userRepository.findByEmail(user.getEmail());
-		if (dbUser.isPresent()) {
-			userRepository.delete(dbUser.get());
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String authenticatedEmail = authentication.getName();
+		User dUser = userRepository.findByEmail(user.getEmail()).orElseThrow();
+		if (dUser.getEmail().equals(authenticatedEmail)) {
+			throw new RuntimeException("ADMİN KENDİNİ SİLEMEZ");
 		}
+		userRepository.delete(dUser);
 	}
 
 	public boolean changePassword(String oldPassword, String newPassword, String email) {
