@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -38,6 +40,8 @@ import jakarta.transaction.Transactional;
 
 @Service
 public class ProductService {
+
+	private static final Logger logger = LoggerFactory.getLogger(ProductService.class);
 
 	@Autowired
 	private ProductRepository productRepository;
@@ -81,7 +85,9 @@ public class ProductService {
 		String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
 		product.setAddedByUser(userEmail);
 
-		return productRepository.save(product);
+		Product addedProduct = productRepository.save(product);
+		logger.info("Product added: {} by user: {}", addedProduct.getName(), userEmail);
+		return addedProduct;
 	}
 
 	public Product updateProduct(Product product) {
@@ -95,7 +101,10 @@ public class ProductService {
 		if (oProduct.isPresent()) {
 			product.setCategory(oProduct.get().getCategory());
 		}
-		return productRepository.save(product);
+		Product updatedProduct = productRepository.save(product);
+		logger.info("Product updated: {} by user: {}", updatedProduct.getName(),
+				SecurityContextHolder.getContext().getAuthentication().getName());
+		return updatedProduct;
 	}
 
 //	public void deleteProduct(UUID id) {
@@ -131,6 +140,7 @@ public class ProductService {
 				product.setDeleted(true); // Soft delete işlemi için isDeleted alanını true yap
 				product.setDeletedAt(LocalDateTime.now());
 				productRepository.save(product);
+				logger.info("Product deleted: {} by user: {}", product.getName(), userEmail);
 			} else {
 				throw new ServiceException(ERROR_CODES.PRODUCT_QUANTİTY_EROR);
 			}
