@@ -202,3 +202,10 @@ This generated password is for development use only. Your security configuration
 2024-05-18 17:08:13 INFO  com.tobeto.service.UserService - User updated: omerrrr@stokwise.com by user: oguzhan@stokwise.com
 2024-05-18 17:08:44 INFO  com.tobeto.service.UserService - User deleted: omerrrr@stokwise.com by user: emir@stokwise.com
 2024-05-18 17:20:38 INFO  com.tobeto.service.UserService - User created: oomer@stokwise.com by user: emir@stokwise.com
+2024-05-20 17:52:32 INFO  com.tobeto.service.UserService - User deleted: ouz by user: kalem@mail.com
+2024-05-20 17:52:34 INFO  com.tobeto.service.UserService - User deleted: asli by user: kalem@mail.com
+2024-05-20 17:52:37 INFO  com.tobeto.service.UserService - User deleted: a@stokwise.com by user: kalem@mail.com
+2024-05-20 17:52:41 INFO  com.tobeto.service.UserService - User deleted: elif by user: kalem@mail.com
+2024-05-20 17:52:43 INFO  com.tobeto.service.UserService - User deleted: nazli by user: kalem@mail.com
+2024-05-20 17:52:46 INFO  com.tobeto.service.UserService - User deleted: guni@mail.com by user: kalem@mail.com
+2024-05-20 17:52:50 INFO  com.tobeto.service.UserService - User deleted: deneme@mail.com by user: kalem@mail.com
