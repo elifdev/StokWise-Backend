@@ -1,6 +1,8 @@
 package com.tobeto.dto.product.response;
 
-import com.tobeto.dto.category.GetCategoryDTO;
+import java.util.UUID;
+
+import com.tobeto.dto.category.request.CategoryRequestDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,9 +12,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GetAllProductsResponseDTO {
-	private int id;
+	private UUID id;
 	private String name;
-	private GetCategoryDTO category;
+	private CategoryRequestDTO category;
 	private double price;
 	private int quantity;
 	private int unitInStock;

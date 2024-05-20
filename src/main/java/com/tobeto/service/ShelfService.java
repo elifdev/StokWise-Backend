@@ -3,6 +3,7 @@ package com.tobeto.service;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.IntStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,14 +44,12 @@ public class ShelfService {
 		}
 	}
 
-	public void updateShelf(int id, int capacity) {
+	public void updateShelf(UUID id, int capacity) {
 		Optional<Shelf> optionalShelf = shelfRepository.findById(id);
 		if (optionalShelf.isPresent()) {
 			Shelf shelf = optionalShelf.get();
-			List<ShelfProduct> shelfProducts = shelfProductRepository
-					.findByShelfId(id);
-			int totalProductCount = shelfProducts.stream()
-					.mapToInt(ShelfProduct::getProductCount).sum();
+			List<ShelfProduct> shelfProducts = shelfProductRepository.findByShelfId(id);
+			int totalProductCount = shelfProducts.stream().mapToInt(ShelfProduct::getProductCount).sum();
 			if (capacity < totalProductCount) {
 				throw new ServiceException(ERROR_CODES.SET_SHELF_COUNT);
 			} else {
@@ -60,9 +59,8 @@ public class ShelfService {
 		}
 	}
 
-	public void deleteShelf(int id) {
-		List<ShelfProduct> shelfProducts = shelfProductRepository
-				.findByShelfId(id);
+	public void deleteShelf(UUID id) {
+		List<ShelfProduct> shelfProducts = shelfProductRepository.findByShelfId(id);
 		int totalCount = 0;
 		for (ShelfProduct shelfProduct : shelfProducts) {
 			totalCount += shelfProduct.getProductCount();
@@ -75,24 +73,20 @@ public class ShelfService {
 	}
 
 	@Transactional
-	public void entryProduct(int productId, int count) { // acceptFruit
+	public void entryProduct(UUID productId, int count) {
 		Product product = productService.getProduct(productId);
 
 		if ((product.getQuantity() - product.getUnitInStock()) >= count) {
 
-			// Ürünü raflara eklerken stok miktarını arttır
 			productService.increaseProductStock(productId, count);
 
 			Category category = product.getCategory();
-			List<Shelf> shelves = shelfRepository
-					.findByShelfProductsProductCategoryId(category.getId());
+			List<Shelf> shelves = shelfRepository.findByShelfProductsProductCategoryId(category.getId());
 
 			List<Shelf> halfShelves = shelves.stream().filter(s -> {
 				int shelfCapacity = s.getCapacity();
 				int totalProductCount = s.getShelfProducts().stream()
-						.flatMapToInt(
-								shelf -> IntStream.of(shelf.getProductCount()))
-						.sum();
+						.flatMapToInt(shelf -> IntStream.of(shelf.getProductCount())).sum();
 				return totalProductCount < shelfCapacity;
 			}).sorted((shelf1, shelf2) -> {
 				int shelfSpace1 = getShelfSpace(shelf1);
@@ -113,38 +107,32 @@ public class ShelfService {
 		} else {
 			throw new ServiceException(ERROR_CODES.NOT_ENOUGH_SPACE_SHELF);
 		}
-
 	}
 
 	public int getShelfSpace(Shelf shelf1) {
 		int shelfCapacity1 = shelf1.getCapacity();
 		int totalProductCount1 = shelf1.getShelfProducts().stream()
-				.flatMapToInt(shelf -> IntStream.of(shelf.getProductCount()))
-				.sum();
+				.flatMapToInt(shelf -> IntStream.of(shelf.getProductCount())).sum();
 		int shelfSpace1 = shelfCapacity1 - totalProductCount1;
 		return shelfSpace1;
 	}
 
-	public int fillShelf(int productId, int count, Product product,
-			Shelf shelf) {
+	public int fillShelf(UUID productId, int count, Product product, Shelf shelf) {
 		int addAmount = count;
 		int totalProductCount = shelf.getShelfProducts().stream()
-				.flatMapToInt(shelfP -> IntStream.of(shelfP.getProductCount()))
-				.sum();
+				.flatMapToInt(shelfP -> IntStream.of(shelfP.getProductCount())).sum();
 		int emptyPart = shelf.getCapacity() - totalProductCount;
 		if (addAmount > emptyPart) {
 			addAmount = emptyPart;
 		}
 		Optional<ShelfProduct> oShelfProduct = shelf.getShelfProducts().stream()
-				.filter(shelfP -> shelfP.getProduct().getId() == productId)
-				.findFirst();
+				.filter(shelfP -> shelfP.getProduct().getId() == productId).findFirst();
 		if (oShelfProduct.isPresent()) {
 			ShelfProduct sProduct = oShelfProduct.get();
 			sProduct.setProductCount(sProduct.getProductCount() + addAmount);
 			shelfProductRepository.save(sProduct);
 		} else {
-			ShelfProduct sProduct = ShelfProduct.builder()
-					.productCount(addAmount).product(product).shelf(shelf)
+			ShelfProduct sProduct = ShelfProduct.builder().productCount(addAmount).product(product).shelf(shelf)
 					.build();
 			shelfProductRepository.save(sProduct);
 		}
@@ -153,7 +141,7 @@ public class ShelfService {
 	}
 
 	public void entryShelf(int count, Product product) {
-		List<Integer> emptyShelfIds = shelfRepository.findEmptyShelves();
+		List<UUID> emptyShelfIds = shelfRepository.findEmptyShelves();
 		Collections.sort(emptyShelfIds);
 
 		int firstEntry = 0;
@@ -161,7 +149,7 @@ public class ShelfService {
 			if (firstEntry >= emptyShelfIds.size()) {
 				throw new ServiceException(ERROR_CODES.NOT_ENOUGH_SHELF);
 			}
-			int shelfId = emptyShelfIds.get(firstEntry);
+			UUID shelfId = emptyShelfIds.get(firstEntry);
 			Optional<Shelf> optionalShelf = shelfRepository.findById(shelfId);
 			if (optionalShelf.isPresent()) {
 				Shelf shelf = optionalShelf.get();
@@ -169,8 +157,7 @@ public class ShelfService {
 				if (addAmount > shelf.getCapacity()) {
 					addAmount = shelf.getCapacity();
 				}
-				ShelfProduct sProduct = ShelfProduct.builder()
-						.productCount(addAmount).product(product).shelf(shelf)
+				ShelfProduct sProduct = ShelfProduct.builder().productCount(addAmount).product(product).shelf(shelf)
 						.build();
 				shelfProductRepository.save(sProduct);
 				count -= addAmount;
@@ -179,8 +166,7 @@ public class ShelfService {
 		}
 	}
 
-	public List<ShelfProduct> getAllProductsFromShelf(int shelfId) {
+	public List<ShelfProduct> getAllProductsFromShelf(UUID shelfId) {
 		return shelfProductRepository.findByShelfId(shelfId);
 	}
-
 }

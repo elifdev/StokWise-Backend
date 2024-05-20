@@ -1,0 +1,10 @@
+2024-05-20 14:09:00 INFO  com.tobeto.service.UserService - User updated: muslum@stokwise.com by user: oguzhan@stokwise.com
+2024-05-20 14:09:08 INFO  com.tobeto.service.UserService - User updated: muslum@stokwise.com by user: oguzhan@stokwise.com
+2024-05-20 15:49:02 INFO  com.tobeto.service.UserService - User updated: muslum@stokwise.com by user: emir@stokwise.com
+2024-05-20 15:49:47 INFO  com.tobeto.service.UserService - User updated: muslum@stokwise.com by user: emir@stokwise.com
+2024-05-20 16:17:24 INFO  com.tobeto.service.UserService - Password changed for user: emir@stokwise.com by user: emir@stokwise.com
+2024-05-20 16:17:37 INFO  com.tobeto.service.UserService - Password changed for user: emir@stokwise.com by user: emir@stokwise.com
+2024-05-20 18:12:49 INFO  com.tobeto.service.UserService - User deleted: oomer@stokwise.com by user: oguzhan@stokwise.com
+2024-05-20 18:13:34 INFO  com.tobeto.service.UserService - User created: ooomer@stokwise.com by user: oguzhan@stokwise.com
+2024-05-20 18:14:41 INFO  com.tobeto.service.UserService - User deleted: ooomer@stokwise.com by user: oguzhan@stokwise.com
+2024-05-20 21:56:28 INFO  com.tobeto.service.UserService - User created: levent@gmail.com by user: oguzhan@stokwise.com

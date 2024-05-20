@@ -1,5 +1,7 @@
 package com.tobeto.dto.shelfProduct.response;
 
+import java.util.UUID;
+
 import com.tobeto.dto.product.response.ProductResponseDTO;
 import com.tobeto.dto.shelf.response.ShelfResponseDTO;
 
@@ -11,10 +13,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GetAllShelvesShelfProductResponseDTO {
-
-	private int id;
+	private UUID id;
 	private ShelfResponseDTO shelf;
 	private int productCount;
 	private ProductResponseDTO product;
-
 }

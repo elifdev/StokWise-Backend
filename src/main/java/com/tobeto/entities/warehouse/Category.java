@@ -1,5 +1,7 @@
 package com.tobeto.entities.warehouse;
 
+import java.util.UUID;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -10,7 +12,7 @@ import lombok.Data;
 @Data
 public class Category {
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int id;
+	@GeneratedValue(strategy = GenerationType.UUID)
+	private UUID id;
 	private String name;
 }
