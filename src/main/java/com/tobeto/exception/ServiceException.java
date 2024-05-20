@@ -25,7 +25,8 @@ public class ServiceException extends RuntimeException {
 
 		CATEGORY_NOT_FOUND(11, "Category not found."),
 
-		PRODUCT_QUANTİTY_EROR(12, "Product quantity is not zero, cannot delete the product. ");
+		PRODUCT_QUANTİTY_EROR(12, "Product quantity is not zero, cannot delete the product. "),
+		ADMIN_CAN_NOT_DELETE(13, "Admin can not delete!");
 
 		private int code;
 		private String message;
