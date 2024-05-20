@@ -39,12 +39,11 @@ public class TokenService {
 
 		for (Role role : onDbRoles) {
 			roles.add(role.getName());
-		} // onDbRoles.forEach(r -> roles.add(r.getName()));
+		}
 
 		customKeys.put("roles", roles);
 
-		builder = builder.claims(customKeys).subject("login")
-				.id(user.getEmail()).issuedAt(new Date())
+		builder = builder.claims(customKeys).subject("login").id(user.getEmail()).issuedAt(new Date())
 				.expiration(Date.from(tokenExp));
 
 		return builder.signWith(getKey()).compact();

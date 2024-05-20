@@ -11,8 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 
 public class UpdateCategoryRequestDTO {
-
 	private UUID id;
 	private String name;
-
 }

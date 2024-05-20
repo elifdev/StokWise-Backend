@@ -27,7 +27,7 @@ import com.tobeto.entities.warehouse.Product;
 import com.tobeto.service.ProductService;
 
 @RestController
-@RequestMapping("/api/v1") // -> api/v1/product
+@RequestMapping("/api/v1")
 public class ProductController {
 
 	@Autowired

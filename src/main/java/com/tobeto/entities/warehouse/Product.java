@@ -27,9 +27,9 @@ public class Product {
 	private Category category;
 
 	private double price;
-	private int quantity; // O ürünün toplam adeti 500 geldi
-	private int unitInStock; // Ürünün o anki stok miktarı 480
-	private int minimumCount; // Uyarı verecek miktarı
+	private int quantity;
+	private int unitInStock;
+	private int minimumCount;
 	private String description;
 
 	@Column(nullable = true)

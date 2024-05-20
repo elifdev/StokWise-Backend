@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tobeto.dto.SuccessResponseDTO;
-import com.tobeto.dto.category.CategoryDTO;
-import com.tobeto.dto.category.GetAllCategories;
+import com.tobeto.dto.category.request.CategoryRequestDTO;
 import com.tobeto.dto.category.request.DeleteCategoryRequestDTO;
 import com.tobeto.dto.category.request.UpdateCategoryRequestDTO;
+import com.tobeto.dto.category.response.GetAllCategoriesResponseDTO;
 import com.tobeto.entities.warehouse.Category;
 import com.tobeto.service.CategoryService;
 
@@ -32,23 +32,22 @@ public class CategoryController {
 	@Qualifier("requestMapper")
 	private ModelMapper requestMapper;
 
-	////
 	@Autowired
 	@Qualifier("responseMapper")
 	private ModelMapper responseMapper;
 
-	@GetMapping("/getAll") // ResponseEntity
-	public ResponseEntity<List<GetAllCategories>> getAllProducts() {
+	@GetMapping("/getAll")
+	public ResponseEntity<List<GetAllCategoriesResponseDTO>> getAllProducts() {
 		List<Category> allCategories = categoryService.getAllCategories();
-		List<GetAllCategories> allCategoriesDTO = new ArrayList<>();
+		List<GetAllCategoriesResponseDTO> allCategoriesDTO = new ArrayList<>();
 		allCategories.forEach(category -> {
-			allCategoriesDTO.add(responseMapper.map(category, GetAllCategories.class));
+			allCategoriesDTO.add(responseMapper.map(category, GetAllCategoriesResponseDTO.class));
 		});
 		return ResponseEntity.ok(allCategoriesDTO);
 	}
 
 	@PostMapping("/addCategory")
-	public SuccessResponseDTO addCategory(@RequestBody CategoryDTO categoryDTO) {
+	public SuccessResponseDTO addCategory(@RequestBody CategoryRequestDTO categoryDTO) {
 		Category category = requestMapper.map(categoryDTO, Category.class);
 		categoryService.addCategory(category);
 		return new SuccessResponseDTO("Category created!");

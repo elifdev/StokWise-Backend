@@ -33,7 +33,6 @@ public class CategoryService {
 		} else {
 			throw new ServiceException(ERROR_CODES.CATEGORY_NOT_FOUND);
 		}
-
 	}
 
 	public void editCategory(UUID id, String name) {
@@ -45,7 +44,5 @@ public class CategoryService {
 		} else {
 			throw new ServiceException(ERROR_CODES.CATEGORY_NOT_FOUND);
 		}
-
 	}
-
 }

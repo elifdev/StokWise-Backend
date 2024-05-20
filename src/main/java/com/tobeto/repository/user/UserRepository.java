@@ -22,10 +22,6 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
 	Optional<User> findByEmailAndIsDeletedFalse(String email);
 
-//	@Modifying
-//	@Query("UPDATE User u SET u.isDeleted = true WHERE u.email = :email")
-//	void softDeleteByEmail(@Param("email") String email);
-
 	@Query("SELECT u FROM User u WHERE u.isDeleted = false")
 	List<User> findAllActive();
 

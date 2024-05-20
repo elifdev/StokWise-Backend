@@ -1,6 +1,4 @@
-package com.tobeto.dto.shelfProduct.request;
-
-import java.util.UUID;
+package com.tobeto.dto.product.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,7 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class EntryProductShelfProductRequestDTO {
-	private UUID productId;
+public class ProductShelfResponseDTO {
+	private String name;
+	private String category;
 	private int count;
 }

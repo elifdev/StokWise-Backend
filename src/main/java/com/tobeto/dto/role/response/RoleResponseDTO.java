@@ -1,11 +1,11 @@
-package com.tobeto.dto.category;
+package com.tobeto.dto.role.response;
 
 import java.util.UUID;
 
 import lombok.Data;
 
 @Data
-public class GetAllCategories {
+public class RoleResponseDTO {
 	private UUID id;
 	private String name;
 }

@@ -23,8 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class UserService {
 
-//	private static final Logger logger = LoggerFactory.getLogger(UserService.class);
-
 	@Autowired
 	private UserRepository userRepository;
 
@@ -57,15 +55,12 @@ public class UserService {
 			User dbUser = oUser.get();
 			dbUser.setEmail(user.getEmail());
 
-			if (!"".equals(user.getPassword())) { // → getPassword null döndürürse false döndürür.
-//				if (!user.getPassword().equals("")) { → getPassword null döndürürse hata döndürür.
-				dbUser.setPassword(passwordEncoder.encode(user.getPassword())); // Parola şifreleme
+			if (!"".equals(user.getPassword())) {
+				dbUser.setPassword(passwordEncoder.encode(user.getPassword()));
 			}
 
-			//
 			List<Role> updatedRoles = user.getRoles();
 			dbUser.setRoles(updatedRoles);
-			//
 
 			User updatedUser = userRepository.save(dbUser);
 			String authenticatedEmail = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -76,23 +71,10 @@ public class UserService {
 		}
 	}
 
-//	public void deleteUser(User user) {
-//		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//		String authenticatedEmail = authentication.getName();
-//		User dUser = userRepository.findByEmail(user.getEmail()).orElseThrow();
-//		if (dUser.getEmail().equals(authenticatedEmail)) {
-//			throw new RuntimeException("ADMİN KENDİNİ SİLEMEZ");
-//		}
-//		userRepository.delete(dUser);
-//	}
-
 	@Transactional
 	public void deleteUser(User user) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		String authenticatedEmail = authentication.getName();
-
-//		User dUser = userRepository.findByEmailAndIsDeletedFalse(user.getEmail())
-//				.orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
 
 		User dUser = userRepository.findByEmail(user.getEmail()).orElseThrow();
 
@@ -111,9 +93,7 @@ public class UserService {
 		Optional<User> oUser = userRepository.findByEmail(email);
 		if (oUser.isPresent()) {
 			User dbUser = oUser.get();
-			// Veritabanındaki şifre ile girilen eski şifre karşılaştırılıyor
 			if (passwordEncoder.matches(oldPassword, dbUser.getPassword())) {
-				// Eski şifre doğruysa, yeni şifreyi şifrele ve güncelle
 				dbUser.setPassword(passwordEncoder.encode(newPassword));
 				userRepository.save(dbUser);
 				String authenticatedEmail = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -123,5 +103,4 @@ public class UserService {
 		}
 		return false;
 	}
-
 }

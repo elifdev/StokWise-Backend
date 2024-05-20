@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EntryShelfShelfProductRequestDTO {
-
 	private int count;
 	private Product product;
 }

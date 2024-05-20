@@ -1,4 +1,4 @@
-package com.tobeto.dto.category;
+package com.tobeto.dto.signup.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class GetCategoryDTO {
-	// private int id;
-	private String name;
+public class SignupResponseDTO {
+	private String token;
 }

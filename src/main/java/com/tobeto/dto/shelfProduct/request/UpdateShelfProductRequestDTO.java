@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UpdateShelfProductRequestDTO {
-
 	private UUID id;
 	private int capacity;
 }
