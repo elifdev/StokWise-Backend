@@ -10,9 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GetAllProductsFromShelvesResponseDTO {
-
 	private UUID id;
 	private long unitInStock;
 	private String name;
-
 }

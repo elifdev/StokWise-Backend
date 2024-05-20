@@ -12,5 +12,4 @@ import lombok.NoArgsConstructor;
 public class DispatchProductRequestDTO {
 	private UUID productId;
 	private int count;
-
 }

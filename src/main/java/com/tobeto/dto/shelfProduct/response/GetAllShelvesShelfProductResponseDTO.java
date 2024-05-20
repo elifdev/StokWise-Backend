@@ -13,10 +13,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GetAllShelvesShelfProductResponseDTO {
-
 	private UUID id;
 	private ShelfResponseDTO shelf;
 	private int productCount;
 	private ProductResponseDTO product;
-
 }

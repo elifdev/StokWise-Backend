@@ -17,8 +17,8 @@ import lombok.ToString;
 
 @Entity
 @Data
-@ToString(exclude = { "roles" }) // ilişkilerde döngüye girmemesi için
-@EqualsAndHashCode(exclude = { "roles" }) // ilişkilerde döngüye girmemesi için
+@ToString(exclude = { "roles" })
+@EqualsAndHashCode(exclude = { "roles" })
 public class User {
 
 	@Id

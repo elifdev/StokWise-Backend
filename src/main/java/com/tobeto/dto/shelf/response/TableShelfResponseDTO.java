@@ -10,10 +10,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TableShelfResponseDTO {
-
 	private UUID id;
 	private int productCount;
 	private int capacity;
 	private String productCategory;
-
 }

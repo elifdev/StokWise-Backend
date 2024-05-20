@@ -1,8 +1,8 @@
-package com.tobeto.dto.signup;
+package com.tobeto.dto.signup.request;
 
 import java.util.List;
 
-import com.tobeto.dto.RoleDTO;
+import com.tobeto.dto.role.response.RoleResponseDTO;
 
 import lombok.Data;
 
@@ -10,5 +10,5 @@ import lombok.Data;
 public class SignupRequestDTO {
 	private String email;
 	private String password;
-	private List<RoleDTO> roles;
+	private List<RoleResponseDTO> roles;
 }

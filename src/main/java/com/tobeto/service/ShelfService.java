@@ -73,12 +73,11 @@ public class ShelfService {
 	}
 
 	@Transactional
-	public void entryProduct(UUID productId, int count) { // acceptFruit
+	public void entryProduct(UUID productId, int count) {
 		Product product = productService.getProduct(productId);
 
 		if ((product.getQuantity() - product.getUnitInStock()) >= count) {
 
-			// Ürünü raflara eklerken stok miktarını arttır
 			productService.increaseProductStock(productId, count);
 
 			Category category = product.getCategory();
@@ -108,7 +107,6 @@ public class ShelfService {
 		} else {
 			throw new ServiceException(ERROR_CODES.NOT_ENOUGH_SPACE_SHELF);
 		}
-
 	}
 
 	public int getShelfSpace(Shelf shelf1) {
@@ -171,5 +169,4 @@ public class ShelfService {
 	public List<ShelfProduct> getAllProductsFromShelf(UUID shelfId) {
 		return shelfProductRepository.findByShelfId(shelfId);
 	}
-
 }

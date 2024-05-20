@@ -16,11 +16,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tobeto.dto.SuccessResponseDTO;
-import com.tobeto.dto.signup.SignupRequestDTO;
-import com.tobeto.dto.signup.SignupResponseDTO;
-import com.tobeto.dto.user.ChangePasswordUserRequestDTO;
-import com.tobeto.dto.user.GetAllUsersResponseDTO;
-import com.tobeto.dto.user.UserRequestDTO;
+import com.tobeto.dto.signup.request.SignupRequestDTO;
+import com.tobeto.dto.signup.response.SignupResponseDTO;
+import com.tobeto.dto.user.request.ChangePasswordUserRequestDTO;
+import com.tobeto.dto.user.request.UserRequestDTO;
+import com.tobeto.dto.user.response.GetAllUsersResponseDTO;
 import com.tobeto.entities.user.User;
 import com.tobeto.service.LoginService;
 import com.tobeto.service.UserService;
@@ -54,11 +54,11 @@ public class UserController {
 
 	}
 
-	@PostMapping("/addUser")
+	@PostMapping("/user/add")
 	public ResponseEntity<SignupResponseDTO> userSignUp(@Validated @RequestBody SignupRequestDTO signupRequestDTO) {
 		String token = loginService.userSignUp(signupRequestDTO.getEmail(), signupRequestDTO.getPassword(),
 				signupRequestDTO.getRoles());
-		return ResponseEntity.ok(new SignupResponseDTO(token)); // SignupResponseDTO ile cevap dön
+		return ResponseEntity.ok(new SignupResponseDTO(token));
 	}
 
 	@PostMapping("/user/update")
