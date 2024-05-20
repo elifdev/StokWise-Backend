@@ -78,6 +78,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.tobeto.dto.RoleDTO;
@@ -103,10 +104,15 @@ public class LoginService {
 	@Autowired
 	private TokenService tokenService;
 
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+
 	@Transactional
 	public String login(String email, String password) {
 		Optional<User> optionalUser = userService.getUserByEmail(email);
-		if (optionalUser.isPresent() && optionalUser.get().getPassword().equals(password)) {
+		if (optionalUser.isPresent() && passwordEncoder.matches(password, optionalUser.get().getPassword()))
+
+		{
 			String token = tokenService.createToken(optionalUser.get());
 			return token;
 		} else {
@@ -116,10 +122,10 @@ public class LoginService {
 
 	public String userSignUp(String email, String password, List<RoleDTO> roleDTOs) {
 		User user = new User();
-		// List<Role> userRole = roleRepository.findAll();
+
 		user.setEmail(email);
-		user.setPassword(password);// password encrypt
-// edilecek
+		user.setPassword(passwordEncoder.encode(password));// password encrypt
+
 		List<Role> roles = roleDTOs.stream()
 				.map(roleDto -> roleRepository.findByName(roleDto.getName())
 						.orElseThrow(() -> new RuntimeException("Role not found: " + roleDto.getName()))) // Rol
@@ -131,4 +137,5 @@ public class LoginService {
 		userService.createUser(user);
 		return tokenService.createToken(user);
 	}
+
 }
