@@ -1,5 +1,6 @@
 package com.tobeto.repository.user;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -19,13 +20,21 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 	@Query("SELECT u.roles FROM User u WHERE u.email = :email")
 	List<Role> findRolesByEmail(@Param("email") String email);
 
-	Optional<User> findByEmailAndDeletedFalse(String email);
+	Optional<User> findByEmailAndIsDeletedFalse(String email);
+
+//	@Modifying
+//	@Query("UPDATE User u SET u.isDeleted = true WHERE u.email = :email")
+//	void softDeleteByEmail(@Param("email") String email);
+
+	@Query("SELECT u FROM User u WHERE u.isDeleted = false")
+	List<User> findAllActive();
 
 	@Modifying
-	@Query("UPDATE User u SET u.deleted = true WHERE u.email = :email")
-	void softDeleteByEmail(@Param("email") String email);
+	@Query("UPDATE User u SET u.isDeleted = true, u.deletedAt = :deletedAt WHERE u.email = :email")
+	void softDeleteByEmail(@Param("email") String email, @Param("deletedAt") LocalDateTime deletedAt);
 
-	@Query("SELECT u FROM User u WHERE u.deleted = false")
-	List<User> findAllActive();
+	@Modifying
+	@Query("DELETE FROM User u WHERE u.isDeleted = true AND u.deletedAt <= :timestamp")
+	void deleteOldSoftDeletedUsers(@Param("timestamp") LocalDateTime timestamp);
 
 }

@@ -1,8 +1,10 @@
 package com.tobeto.entities.warehouse;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -30,7 +32,15 @@ public class Product {
 	private int minimumCount; // Uyarı verecek miktarı
 	private String description;
 
+	@Column(nullable = true)
+	private String addedByUser;
+
 	private boolean isDeleted = false;
+
+	@Column(nullable = true)
+	private String deletedByUser;
+
+	private LocalDateTime deletedAt;
 
 	@OneToMany(mappedBy = "product")
 	private List<ShelfProduct> shelfProducts;

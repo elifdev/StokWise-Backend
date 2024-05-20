@@ -137,4 +137,5 @@ public class LoginService {
 		userService.createUser(user);
 		return tokenService.createToken(user);
 	}
+
 }
